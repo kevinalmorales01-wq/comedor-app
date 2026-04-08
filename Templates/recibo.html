@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo de Venta</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .ticket {
+            background: #fff;
+            width: 350px;
+            padding: 20px;
+            border: 2px dashed #333;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+        }
+        .ticket-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .ticket-header h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #007BFF;
+        }
+        .ticket-header p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .detalle h3 {
+            margin: 10px 0;
+            font-size: 16px;
+            border-bottom: 1px solid #ddd;
+            color: #333;
+        }
+        .item {
+            font-size: 14px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .item em {
+            display: block;
+            font-size: 12px;
+            color: #777;
+        }
+        .metodo {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 15px;
+            color: #007BFF;
+        }
+        .acciones {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .acciones button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #007BFF;
+            border: none;
+            color: white;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .acciones button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <!-- Encabezado del recibo -->
+        <div class="ticket-header">
+            <h2>El Chavalo Nica</h2>
+            <p>Recibo de Venta</p>
+            <p>Fecha: {{ fecha }}</p>
+        </div>
+
+        <!-- Detalle de productos -->
+        <div class="detalle">
+            <h3>Platos</h3>
+            {% for plato in platos %}
+                <div class="item">
+                    <span>{{ plato['nombre'] }}</span>
+                    <span>Q{{ plato['precio'] }}</span>
+                </div>
+                <em>{{ plato['descripcion'] }}</em>
+            {% endfor %}
+
+            {% if bebidas %}
+            <h3>Bebidas</h3>
+            {% for bebida in bebidas %}
+                <div class="item">
+                    <span>{{ bebida['nombre'] }}</span>
+                    <span>Q{{ bebida['precio'] }}</span>
+                </div>
+                <em>{{ bebida['descripcion'] }}</em>
+            {% endfor %}
+            {% endif %}
+
+            {% if adicionales %}
+            <h3>Adicionales</h3>
+            {% for adicional in adicionales %}
+                <div class="item">
+                    <span>{{ adicional['nombre'] }}</span>
+                    <span>Q{{ adicional['precio'] }}</span>
+                </div>
+                <em>{{ adicional['descripcion'] }}</em>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Método de pago -->
+        <div class="metodo">
+            <strong>Método de pago:</strong> {{ metodo_pago }}
+        </div>
+
+        <!-- Total -->
+        <div class="total">
+            Total: Q{{ total }}
+        </div>
+
+        <!-- Acciones -->
+        <div class="acciones">
+            <button onclick="window.print()">Imprimir / Guardar PDF</button>
+            <a href="/menu"><button type="button">Registrar otra venta</button></a>
+        </div>
+    </div>
+</body>
+</html>

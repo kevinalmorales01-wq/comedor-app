@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Menú de Ventas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        /* Banner superior */
+        .banner {
+            width: 100%;
+            background: #007BFF;
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+        }
+        /* Layout principal */
+        .main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        /* Tablero kanban */
+        .menu-board {
+            flex: 3;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            overflow-y: auto;
+        }
+        .section {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #007BFF;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        .card {
+            background: #fafafa;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+            padding: 10px;
+            text-align: center;
+        }
+        .card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .nombre { font-weight: bold; font-size: 16px; }
+        .precio { color: green; font-weight: bold; }
+        .descripcion { font-style: italic; color: #555; font-size: 14px; margin-bottom: 8px; }
+        .card input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        /* Panel lateral */
+        .preview-panel {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            border-left: 2px solid #ddd;
+            box-shadow: -2px 0px 8px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .preview-panel h3 { margin-top: 0; color: #333; }
+        .preview-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+        .total { font-size: 18px; font-weight: bold; color: #007BFF; margin-top: 20px; }
+        .payment-options {
+            margin-top: 15px;
+            text-align: left;
+        }
+        .payment-options label {
+            display: block;
+            margin: 8px 0;
+            font-weight: bold;
+            color: #444;
+        }
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #007BFF;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <!-- Banner superior -->
+    <div class="banner">Selección de productos</div>
+
+    <form action="/registrar_venta" method="POST" class="main">
+        <!-- Tablero kanban -->
+        <div class="menu-board">
+            <!-- Sección Platos -->
+            <div class="section">
+                <h3>Platos principales</h3>
+                <div class="cards">
+                    {% for plato in platos %}
+                        <div class="card">
+                            <img src="/static/images/{{ plato['id'] }}.jpg" alt="{{ plato['nombre'] }}">
+                            <span class="nombre">{{ plato['nombre'] }}</span>
+                            <span class="precio">Q{{ plato['precio'] }}</span>
+                            <span class="descripcion">{{ plato['descripcion'] }}</span>
+                            <input type="number" name="platos_id_{{ plato['id'] }}" min="0" value="0">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Sección Bebidas -->
+            <div class="section">
+                <h3>Bebidas</h3>
+                <div class="cards">
+                    {% for plato in platos %}
+                        {% if "Cacao" in plato['nombre'] or "Chicha" in plato['nombre'] or "Calala" in plato['nombre'] or "Chía" in plato['nombre'] or "Arroz con piña" in plato['nombre'] %}
+                            <div class="card">
+                                <img src="/static/images/{{ plato['id'] }}.jpg" alt="{{ plato['nombre'] }}">
+                                <span class="nombre">{{ plato['nombre'] }}</span>
+                                <span class="precio">Q{{ plato['precio'] }}</span>
+                                <span class="descripcion">{{ plato['descripcion'] }}</span>
+                                <input type="number" name="bebidas_id_{{ plato['id'] }}" min="0" value="0">
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Sección Adicionales -->
+            <div class="section">
+                <h3>Adicionales</h3>
+                <div class="cards">
+                    {% for adicional in adicionales %}
+                        <div class="card">
+                            <img src="/static/images/adicional_{{ adicional['id'] }}.jpg" alt="{{ adicional['nombre'] }}">
+                            <span class="nombre">{{ adicional['nombre'] }}</span>
+                            <span class="precio">Q{{ adicional['precio'] }}</span>
+                            <span class="descripcion">{{ adicional['descripcion'] }}</span>
+                            <input type="number" name="adicionales_id_{{ adicional['id'] }}" min="0" value="0">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel lateral de vista previa -->
+        <div class="preview-panel">
+            <h3>Vista previa</h3>
+            <div id="preview-list"></div>
+            <div class="total" id="total">Total: Q0.00</div>
+
+            <!-- Botones de método de pago -->
+            <h3>Método de pago</h3>
+            <div class="payment-options">
+                <label><input type="radio" name="metodo_pago" value="Tarjeta" required> Pago con Tarjeta</label>
+                <label><input type="radio" name="metodo_pago" value="Efectivo"> Pago con Efectivo</label>
+                <label><input type="radio" name="metodo_pago" value="Transferencia"> Transferencia</label>
+            </div>
+
+            <button type="submit">Registrar Venta</button>
+        </div>
+    </form>
+
+    <script>
+        const inputs = document.querySelectorAll('input[type="number"]');
+        const previewList = document.getElementById('preview-list');
+        const totalElement = document.getElementById('total');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+
+        function updatePreview() {
+            previewList.innerHTML = '';
+            let total = 0;
+
+            inputs.forEach(input => {
+                const cantidad = parseInt(input.value);
+                if (cantidad > 0) {
+                    const nombre = input.parentElement.querySelector('.nombre').textContent;
+                    const precio = parseFloat(input.parentElement.querySelector('.precio').textContent.replace('Q',''));
+                    total += precio * cantidad;
+
+                    const item = document.createElement('div');
+                    item.classList.add('preview-item');
+                    item.innerHTML = `<span>${nombre} x${cantidad}</span><span>Q${(precio * cantidad).toFixed(2)}</span>`;
+                    previewList.appendChild(item);
+                }
+            });
+
+            totalElement.textContent = `Total: Q${total.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
