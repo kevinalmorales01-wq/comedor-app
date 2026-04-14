@@ -47,11 +47,6 @@
             display: flex;
             justify-content: space-between;
         }
-        .item em {
-            display: block;
-            font-size: 12px;
-            color: #777;
-        }
         .metodo {
             margin-top: 15px;
             font-size: 14px;
@@ -85,43 +80,38 @@
 <body>
     <div class="ticket">
         <!-- Encabezado del recibo -->
-       <div class="detalle">
-    <h3>Platos</h3>
-    {% for nombre, datos in platos.items() %}
-        <div class="item">
-            <span>{{ nombre }} (x{{ datos['cantidad'] }})</span>
-            <span>Q{{ datos['precio'] * datos['cantidad'] }}</span>
+        <div class="ticket-header">
+            <h2>El Chavalo Nica</h2>
+            <p>Recibo de Venta</p>
+            <p>Fecha: {{ fecha }}</p>
         </div>
-    {% endfor %}
 
-    {% if bebidas %}
-    <h3>Bebidas</h3>
-    {% for nombre, datos in bebidas.items() %}
-        <div class="item">
-            <span>{{ nombre }} (x{{ datos['cantidad'] }})</span>
-            <span>Q{{ datos['precio'] * datos['cantidad'] }}</span>
-        </div>
-    {% endfor %}
-    {% endif %}
+        <!-- Detalle de productos -->
+        <div class="detalle">
+            <h3>Platos</h3>
+            {% for nombre, datos in platos.items() %}
+                <div class="item">
+                    <span>{{ nombre }} (x{{ datos['cantidad'] }})</span>
+                    <span>Q{{ datos['precio'] * datos['cantidad'] }}</span>
+                </div>
+            {% endfor %}
 
-    {% if adicionales %}
-    <h3>Adicionales</h3>
-    {% for nombre, datos in adicionales.items() %}
-        <div class="item">
-            <span>{{ nombre }} (x{{ datos['cantidad'] }})</span>
-            <span>Q{{ datos['precio'] * datos['cantidad'] }}</span>
-        </div>
-    {% endfor %}
-    {% endif %}
-</div>
-
+            {% if bebidas %}
+            <h3>Bebidas</h3>
+            {% for nombre, datos in bebidas.items() %}
+                <div class="item">
+                    <span>{{ nombre }} (x{{ datos['cantidad'] }})</span>
+                    <span>Q{{ datos['precio'] * datos['cantidad'] }}</span>
+                </div>
+            {% endfor %}
+            {% endif %}
 
             {% if adicionales %}
             <h3>Adicionales</h3>
-            {% for adicional in adicionales %}
+            {% for nombre, datos in adicionales.items() %}
                 <div class="item">
-                    <span>{{ adicional['nombre'] }}</span>
-                    <span>Q{{ adicional['precio'] }}</span>
+                    <span>{{ nombre }} (x{{ datos['cantidad'] }})</span>
+                    <span>Q{{ datos['precio'] * datos['cantidad'] }}</span>
                 </div>
             {% endfor %}
             {% endif %}
