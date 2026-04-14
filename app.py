@@ -161,60 +161,59 @@ GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSedNDbBCFR7Cmo97
 def registrar_venta():
     usuario_id = 1  # El Chavalo Nica (admin fijo por ahora)
     fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    metodo_pago = request.form.get("metodo_pago")  # <-- capturamos el método de pago
+    metodo_pago = request.form.get("metodo_pago")
 
     conn = get_db_connection()
 
-    # Obtener todos los platos y adicionales de la BD
     platos = conn.execute("SELECT * FROM platos").fetchall()
     adicionales = conn.execute("SELECT * FROM adicionales").fetchall()
 
-    # Guardar platos con cantidad
-    platos_seleccionados = []
+    # Diccionarios para agrupar cantidades
+    platos_seleccionados = {}
+    adicionales_seleccionados = {}
+    bebidas_seleccionadas = {}
+
+    # Platos
     for plato in platos:
         cantidad = int(request.form.get(f"platos_id_{plato['id']}", 0))
-        for _ in range(cantidad):
+        if cantidad > 0:
             conn.execute("INSERT INTO ventas (usuario_id, plato_id, fecha, metodo_pago) VALUES (?, ?, ?, ?)",
                          (usuario_id, plato['id'], fecha, metodo_pago))
-            platos_seleccionados.append(plato)
+            platos_seleccionados[plato['nombre']] = {
+                "precio": plato['precio'],
+                "cantidad": cantidad
+            }
 
-    # Guardar adicionales con cantidad
-    adicionales_seleccionados = []
+    # Adicionales
     for adicional in adicionales:
         cantidad = int(request.form.get(f"adicionales_id_{adicional['id']}", 0))
-        for _ in range(cantidad):
+        if cantidad > 0:
             conn.execute("INSERT INTO ventas (usuario_id, adicional_id, fecha, metodo_pago) VALUES (?, ?, ?, ?)",
                          (usuario_id, adicional['id'], fecha, metodo_pago))
-            adicionales_seleccionados.append(adicional)
+            adicionales_seleccionados[adicional['nombre']] = {
+                "precio": adicional['precio'],
+                "cantidad": cantidad
+            }
 
-    # Guardar bebidas con cantidad (filtradas desde platos)
-    bebidas_seleccionadas = []
+    # Bebidas (filtradas desde platos)
     for plato in platos:
         if any(b in plato['nombre'] for b in ["Cacao", "Chicha", "Calala", "Chía", "Arroz con piña"]):
             cantidad = int(request.form.get(f"bebidas_id_{plato['id']}", 0))
-            for _ in range(cantidad):
+            if cantidad > 0:
                 conn.execute("INSERT INTO ventas (usuario_id, bebida_id, fecha, metodo_pago) VALUES (?, ?, ?, ?)",
                              (usuario_id, plato['id'], fecha, metodo_pago))
-                bebidas_seleccionadas.append(plato)
+                bebidas_seleccionadas[plato['nombre']] = {
+                    "precio": plato['precio'],
+                    "cantidad": cantidad
+                }
 
     conn.commit()
     conn.close()
 
     # Calcular total
-    total = sum([p['precio'] for p in platos_seleccionados])
-    total += sum([a['precio'] for a in adicionales_seleccionados])
-    total += sum([b['precio'] for b in bebidas_seleccionadas])
-
-    # Enviar datos al Google Form (cada entry.xxxxx corresponde a un campo del formulario)
-    data = {
-        "entry.360908093": fecha,
-        "entry.1059433338": metodo_pago,
-        "entry.377586060": total,
-        "entry.1886728710": ", ".join([p['nombre'] for p in platos_seleccionados]),
-        "entry.690270562": ", ".join([b['nombre'] for b in bebidas_seleccionadas]),
-        "entry.1668748071": ", ".join([a['nombre'] for a in adicionales_seleccionados])
-    }
-    requests.post(GOOGLE_FORM_URL, data=data)
+    total = sum([datos["precio"] * datos["cantidad"] for datos in platos_seleccionados.values()])
+    total += sum([datos["precio"] * datos["cantidad"] for datos in adicionales_seleccionados.values()])
+    total += sum([datos["precio"] * datos["cantidad"] for datos in bebidas_seleccionadas.values()])
 
     # Renderizar recibo
     return render_template('recibo.html',
