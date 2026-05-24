@@ -136,23 +136,22 @@
                 </div>
             </div>
 
-            <!-- Sección Bebidas -->
-            <div class="section">
-                <h3>Bebidas</h3>
-                <div class="cards">
-                    {% for plato in platos %}
-                        {% if "Cacao" in plato['nombre'] or "Chicha" in plato['nombre'] or "Calala" in plato['nombre'] or "Chía" in plato['nombre'] or "Arroz con piña" in plato['nombre'] %}
-                            <div class="card">
-                                <img src="/static/images/{{ plato['id'] }}.jpg" alt="{{ plato['nombre'] }}">
-                                <span class="nombre">{{ plato['nombre'] }}</span>
-                                <span class="precio">Q{{ plato['precio'] }}</span>
-                                <span class="descripcion">{{ plato['descripcion'] }}</span>
-                                <input type="number" name="bebidas_id_{{ plato['id'] }}" min="0" value="0">
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+           <!-- Sección Bebidas -->
+<div class="section">
+    <h3>Bebidas</h3>
+    <div class="cards">
+        {% for bebida in bebidas %}
+            <div class="card">
+                <img src="/static/images/{{ bebida['id'] }}.jpg" alt="{{ bebida['nombre'] }}">
+                <span class="nombre">{{ bebida['nombre'] }}</span>
+                <span class="precio">Q{{ bebida['precio'] }}</span>
+                <span class="descripcion">{{ bebida['descripcion'] }}</span>
+                <input type="number" name="bebidas_id_{{ bebida['id'] }}" min="0" value="0">
             </div>
+        {% endfor %}
+    </div>
+</div>
+
 
             <!-- Sección Adicionales -->
             <div class="section">

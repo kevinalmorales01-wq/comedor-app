@@ -148,10 +148,19 @@ def do_login():
 @app.route('/menu')
 def menu():
     conn = get_db_connection()
-    platos = conn.execute("SELECT * FROM platos").fetchall()
+    todos_platos = conn.execute("SELECT * FROM platos").fetchall()
     adicionales = conn.execute("SELECT * FROM adicionales").fetchall()
     conn.close()
-    return render_template('menu.html', platos=platos, adicionales=adicionales)
+
+    # Palabras clave para bebidas
+    bebidas_keywords = ["Cacao", "Chicha", "Calala", "Chía", "Arroz con piña"]
+
+    # Separar platos principales y bebidas
+    platos = [p for p in todos_platos if not any(k in p["nombre"] for k in bebidas_keywords)]
+    bebidas = [p for p in todos_platos if any(k in p["nombre"] for k in bebidas_keywords)]
+
+    return render_template('menu.html', platos=platos, bebidas=bebidas, adicionales=adicionales)
+
 
 import requests
 
@@ -172,6 +181,20 @@ def registrar_venta():
     platos_seleccionados = {}
     adicionales_seleccionados = {}
     bebidas_seleccionadas = {}
+
+    # Platos
+    for plato in platos:
+        cantidad = int(request.form.get(f"platos_id_{plato['id']}", 0))
+        if cantidad > 0:
+            conn.execute("INSERT INTO ventas (usuario_id, plato_id, fecha, metodo_pago) VALUES (?, ?, ?, ?)",
+                         (usuario_id, plato['id'], fecha, metodo_pago))
+            platos_seleccionados[plato['nombre']] = {
+                "precio": plato['precio'],
+                "cantidad": cantidad
+            }
+
+    # Adicionales
+    for adicional in adicionales:
 
     # Platos
     for plato in platos:
